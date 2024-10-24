@@ -1,31 +1,30 @@
 package cat.iesesteveterradas;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        Path filePath = obtenirPathFitxer();
+        String basePath = System.getProperty("user.dir") + "/data/";
+        String filePath = basePath + "database.db";
 
-        try {
-            List<String> lines = readFileContent(filePath);
-
-            // Imprimir les línies a la consola
-            lines.forEach(System.out::println);
-        } catch (IOException e) {
-            System.out.println("S'ha produït un error en llegir el fitxer: " + e.getMessage());
-        }
+        File databaseForHonor = new File(filePath);
     }
 
-    public static Path obtenirPathFitxer() {
-        return Paths.get(System.getProperty("user.dir"), "data", "bones_practiques_programacio.txt");
-    }
+    static void initDatabase(String databaseFile) {
+        Connection conn = UtilsSQL.connect(databaseFile);
 
-    public static List<String> readFileContent(Path filePath) throws IOException {
-        return Files.readAllLines(filePath);
+        UtilsSQL.queryUpdate(conn, "DROP TABLE IF EXISTS Faccio;");
+        UtilsSQL.queryUpdate(conn, "DROP TABLE IF EXISTS Personatge;");
+
+        UtilsSQL.queryUpdate(conn, "CREATE TABLE IF NOT EXISTS warehouses ("
+        + "	id integer PRIMARY KEY AUTOINCREMENT,"
+        + "	name text NOT NULL);");
     }
 }
